@@ -34,8 +34,10 @@ jobs:
         host: 3.7.249.110
         username: ec2-user
         key: ${{ secrets.EC2_KEY }}
+        port: 22
         source: "employee-app.tar"
         target: "/home/ec2-user/"
+        debug: true
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v0.1.6
@@ -43,7 +45,9 @@ jobs:
         host: 3.7.249.110
         username: ec2-user
         key: ${{ secrets.EC2_KEY }}
+        port: 22
         script: |
+          sudo systemctl start docker
           docker load < employee-app.tar
           docker stop app || true
           docker rm app || true
