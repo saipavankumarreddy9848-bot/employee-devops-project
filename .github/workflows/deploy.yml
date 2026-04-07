@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
-      run: mvn -B clean package
+      run: mvn clean package
 
     - name: Build Docker image
       run: docker build -t employee-app .
@@ -31,24 +31,19 @@ jobs:
     - name: Copy to EC2
       uses: appleboy/scp-action@v0.1.3
       with:
-        host: 3.7.249.110
-        username: ec2-user
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
-        port: 22
         source: "employee-app.tar"
         target: "/home/ec2-user/"
-        debug: true
 
     - name: Deploy on EC2
       uses: appleboy/ssh-action@v0.1.6
       with:
-        host: 3.7.249.110
-        username: ec2-user
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
-        port: 22
         script: |
-          sudo systemctl start docker
           docker load < employee-app.tar
-          docker stop app || true
-          docker rm app || true
-          docker run -d -p 8080:8080 --name app employee-app
+          docker rm -f app || true
+          docker run -d --name app --network mynet -p 8080:8080 employee-app
