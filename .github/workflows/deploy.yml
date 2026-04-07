@@ -28,6 +28,12 @@ jobs:
     - name: Save Docker image
       run: docker save employee-app > employee-app.tar
 
+    - name: Build Docker image
+      run: docker build -t saipavan9848/saipavan-employee-app:latest .
+
+    - name: Push Docker image
+      run: docker push saipavan9848/saipavan-employee-app:latest
+
     - name: Copy to EC2
       uses: appleboy/scp-action@v0.1.3
       with:
