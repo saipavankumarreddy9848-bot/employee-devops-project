@@ -29,8 +29,8 @@ jobs:
       - name: Debug Docker Username
       run: echo "USERNAME=${{ secrets.DOCKER_USERNAME }}"
       
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.SAIPAVAN9848 }}
+        password: ${{ secrets.SAIPAVAN9848 }}
 
     # ✅ BUILD IMAGE
     - name: Build Docker image
