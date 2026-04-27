@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employee_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - mynet
+
+  app:
+    image: saipavan9848/saipavan-employee-app:latest
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - mynet
+
+volumes:
+  mysql-data:
+
+networks:
+  mynet:
