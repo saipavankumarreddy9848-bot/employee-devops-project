@@ -1,5 +1,4 @@
 services:
-
   mysql:
     image: mysql:8
     container_name: mysql-db
@@ -10,10 +9,15 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - mynet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
 
   app:
     image: saipavan9848/saipavan-employee-app:latest
     container_name: app
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
@@ -27,6 +31,7 @@ services:
 
 volumes:
   mysql-data:
+    name: employee-devops-project_mysql-data
 
 networks:
   mynet:
