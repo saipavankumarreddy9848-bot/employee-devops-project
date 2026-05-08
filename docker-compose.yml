@@ -9,15 +9,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: employee_db
+      MYSQL_USER: sai
+      MYSQL_PASSWORD: sai
 
     ports:
       - "3306:3306"
 
     volumes:
       - mysql-data:/var/lib/mysql
-
-    networks:
-      - mynet
 
   employee-app:
     build: ./backend
@@ -29,14 +28,11 @@ services:
 
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/employee_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_USERNAME: sai
+      SPRING_DATASOURCE_PASSWORD: sai
 
     ports:
       - "8080:8080"
-
-    networks:
-      - mynet
 
   frontend:
     build: ./frontend
@@ -46,13 +42,17 @@ services:
     depends_on:
       - employee-app
 
-    networks:
-      - mynet
+    ports:
+      - "3000:80"
 
   nginx:
     image: nginx:latest
 
     container_name: nginx
+
+    depends_on:
+      - frontend
+      - employee-app
 
     ports:
       - "80:80"
@@ -60,15 +60,5 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 
-    depends_on:
-      - frontend
-      - employee-app
-
-    networks:
-      - mynet
-
 volumes:
   mysql-data:
-
-networks:
-  mynet:
