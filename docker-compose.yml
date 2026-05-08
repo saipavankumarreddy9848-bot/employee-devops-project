@@ -1,37 +1,74 @@
+version: '3.8'
+
 services:
+
   mysql:
     image: mysql:8
     container_name: mysql-db
+
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: employee_db
+
+    ports:
+      - "3306:3306"
+
     volumes:
       - mysql-data:/var/lib/mysql
+
     networks:
       - mynet
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      retries: 5
 
-  app:
-    image: saipavan9848/saipavan-employee-app:latest
-    container_name: app
-    restart: always
-    ports:
-      - "8080:8080"
+  employee-app:
+    build: ./backend
+
+    container_name: employee-app
+
     depends_on:
       - mysql
-    networks:
-      - mynet
+
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/employee_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/employee_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
 
+    ports:
+      - "8080:8080"
+
+    networks:
+      - mynet
+
+  frontend:
+    build: ./frontend
+
+    container_name: frontend
+
+    depends_on:
+      - employee-app
+
+    networks:
+      - mynet
+
+  nginx:
+    image: nginx:latest
+
+    container_name: nginx
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+    depends_on:
+      - frontend
+      - employee-app
+
+    networks:
+      - mynet
+
 volumes:
   mysql-data:
-    name: employee-devops-project_mysql-data
 
 networks:
   mynet:
